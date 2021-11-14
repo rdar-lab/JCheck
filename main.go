@@ -3,10 +3,13 @@ package main
 import (
 	"github.com/jfrog/jfrog-cli-core/v2/plugins"
 	"github.com/jfrog/jfrog-cli-core/v2/plugins/components"
+	"github.com/rdar-lab/JCheck/checks"
 	"github.com/rdar-lab/JCheck/commands"
+	"github.com/rdar-lab/JCheck/common"
 )
 
 func main() {
+	RegisterChecks()
 	plugins.PluginMain(getApp())
 }
 
@@ -24,4 +27,8 @@ func getCommands() []components.Command {
 		commands.GetListCommand(),
 		commands.GetCheckCommand(),
 	}
+}
+
+func RegisterChecks() {
+	common.GetRegistry().Register(checks.GetDummyCheck())
 }
