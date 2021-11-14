@@ -18,22 +18,44 @@ Uninstalling a plugin
 
 ## Usage
 ### Commands
-* hello
+* list
     - Arguments:
-        - addressee - The name of the person you would like to greet.
+        - None
     - Flags:
-        - shout: Makes output uppercase **[Default: false]**
-        - repeat: Greets multiple times **[Default: 1]**
+        - None
     - Example:
     ```
-  $ jfrog hello-frog hello world --shout --repeat=2
+  $ jfrog JCheck list
+
+  Name        Description   Group       Is Read Only
+  Check...    Desc...       Group....   true/false  
+  Check...    Desc...       Group....   true/false  
+  Check...    Desc...       Group....   true/false  
+
+  ```
+
+* check
+    - Arguments:
+        - what - The names of the checks you want to run. It can be a group name, check name or ALL for all
+    - Flags:
+        - readOnlyMode: Only run checks which are read only. **[Default: false]**
+    - Example:
+    ```
+  $ jfrog JCheck ALL
   
-  NEW GREETING: HELLO WORLD!
-  NEW GREETING: HELLO WORLD!
+  ** Running check: DummyCheck...
+    Finished running check: check1, result=true, message=Everything OK
+
+
+    Name        Is Success  Message
+    Check...    true        Everything OK
+    Check...    true        Everything OK
+    Check...    true        Everything OK
+     
   ```
 
 ### Environment variables
-* HELLO_FROG_GREET_PREFIX - Adds a prefix to every greet **[Default: New greeting: ]**
+None
 
 ## Additional info
 None.
