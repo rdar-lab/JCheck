@@ -1,4 +1,4 @@
-module github.com/jfrog/jfrog-cli-plugin-template
+module github.com/rdar-lab/JCheck
 
 go 1.14
 

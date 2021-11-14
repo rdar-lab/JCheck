@@ -1,21 +1,20 @@
-# hello-frog
+# JCheck
 
 ## About this plugin
-This plugin is a template and a functioning example for a basic JFrog CLI plugin. 
-This README shows the expected structure of your plugin's README.
+A Micro-UTP, plug-able sanity checker for any on-prem JFrog platform instance
 
 ## Installation with JFrog CLI
 Installing the latest version:
 
-`$ jfrog plugin install hello-frog`
+`$ jfrog plugin install JCheck`
 
 Installing a specific version:
 
-`$ jfrog plugin install hello-frog@version`
+`$ jfrog plugin install JCheck@version`
 
 Uninstalling a plugin
 
-`$ jfrog plugin uninstall hello-frog`
+`$ jfrog plugin uninstall JCheck`
 
 ## Usage
 ### Commands
