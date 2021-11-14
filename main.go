@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	RegisterChecks()
+	registerChecks()
 	plugins.PluginMain(getApp())
 }
 
@@ -29,6 +29,7 @@ func getCommands() []components.Command {
 	}
 }
 
-func RegisterChecks() {
+// TODO: Add ability to inject external checks via configuration
+func registerChecks() {
 	common.GetRegistry().Register(checks.GetDummyCheck())
 }
