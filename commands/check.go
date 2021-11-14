@@ -41,6 +41,11 @@ func getCheckFlags() []components.Flag {
 			Description:  "Only run checks which are read only.",
 			DefaultValue: false,
 		},
+		components.StringFlag{
+			Name:         "loop",
+			Description:  "Loop over times.",
+			DefaultValue: "1",
+		},
 	}
 }
 
@@ -51,6 +56,7 @@ func getCheckEnvVar() []components.EnvVar {
 type checkConfiguration struct {
 	what         string
 	readOnlyMode bool
+	loop         int
 }
 
 func checkCmd(c *components.Context) error {
@@ -61,19 +67,37 @@ func checkCmd(c *components.Context) error {
 	var conf = new(checkConfiguration)
 	conf.what = c.Arguments[0]
 	conf.readOnlyMode = c.GetBoolFlagValue("readOnlyMode")
+	loop, err := strconv.Atoi(c.GetStringFlagValue("loop"))
+	if err != nil {
+		return err
+	}
+	conf.loop = loop
+
 	return doCheck(conf)
+}
+
+type resultPair struct {
+	check  *common.CheckDef
+	result *common.CheckResult
 }
 
 func doCheck(conf *checkConfiguration) error {
 	failureInd := false
-	results := make(map[*common.CheckDef]*common.CheckResult)
-	for _, check := range common.GetRegistry().GetAllChecks() {
-		if conf.what == "" || conf.what == "ALL" || conf.what == check.Name || conf.what == check.Group {
-			if check.IsReadOnly || !conf.readOnlyMode {
-				result := runCheck(check)
-				results[check] = result
-				if !result.Success {
-					failureInd = true
+	results := make([]*resultPair, 0, len(common.GetRegistry().GetAllChecks())*conf.loop)
+	for i := 0; i < conf.loop; i++ {
+		for _, check := range common.GetRegistry().GetAllChecks() {
+			if conf.what == "" || conf.what == "ALL" || conf.what == check.Name || conf.what == check.Group {
+				if check.IsReadOnly || !conf.readOnlyMode {
+					result := runCheck(check)
+					results = append(results,
+						&resultPair{
+							check:  check,
+							result: result,
+						},
+					)
+					if !result.Success {
+						failureInd = true
+					}
 				}
 			}
 		}
@@ -85,8 +109,8 @@ func doCheck(conf *checkConfiguration) error {
 	tbl := table.New("Name", "Is Success", "Message")
 	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
-	for check, result := range results {
-		tbl.AddRow(check.Name, result.Success, result.Message)
+	for _, pair := range results {
+		tbl.AddRow(pair.check.Name, pair.result.Success, pair.result.Message)
 	}
 	fmt.Println()
 	fmt.Println()

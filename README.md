@@ -39,13 +39,13 @@ Uninstalling a plugin
         - what - The names of the checks you want to run. It can be a group name, check name or ALL for all
     - Flags:
         - readOnlyMode: Only run checks which are read only. **[Default: false]**
+        - loop: Loop over times. **[Default: 1]**
     - Example:
     ```
   $ jfrog JCheck ALL
   
-  ** Running check: DummyCheck...
+    ** Running check: check1...
     Finished running check: check1, result=true, message=Everything OK
-
 
     Name        Is Success  Message
     Check...    true        Everything OK
