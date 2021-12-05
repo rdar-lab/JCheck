@@ -2,10 +2,12 @@ package commands
 
 import (
 	context2 "context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/fatih/color"
 	"github.com/jfrog/jfrog-cli-core/v2/plugins/components"
+	"github.com/jfrog/jfrog-client-go/utils/log"
 	"github.com/rdar-lab/JCheck/common"
 	"github.com/rodaine/table"
 	"strconv"
@@ -13,8 +15,8 @@ import (
 )
 
 type checkResult struct {
-	Success bool
-	Message string
+	Success bool   `json:"is_success"`
+	Message string `json:"message"`
 }
 
 func GetCheckCommand() components.Command {
@@ -52,6 +54,11 @@ func getCheckFlags() []components.Flag {
 			Description:  "Loop over times.",
 			DefaultValue: "1",
 		},
+		components.BoolFlag{
+			Name:         "json",
+			Description:  "Return JSON result",
+			DefaultValue: false,
+		},
 	}
 }
 
@@ -63,6 +70,7 @@ type checkConfiguration struct {
 	what         string
 	readOnlyMode bool
 	loop         int
+	json         bool
 }
 
 func checkCmd(c *components.Context) error {
@@ -78,13 +86,14 @@ func checkCmd(c *components.Context) error {
 		return err
 	}
 	conf.loop = loop
+	conf.json = c.GetBoolFlagValue("json")
 
 	return doCheck(conf)
 }
 
 type resultPair struct {
-	check  *common.CheckDef
-	result *checkResult
+	Check  *common.CheckDef `json:"check_def"`
+	Result *checkResult     `json:"result"`
 }
 
 func doCheck(conf *checkConfiguration) error {
@@ -97,8 +106,8 @@ func doCheck(conf *checkConfiguration) error {
 					result := runCheck(check)
 					results = append(results,
 						&resultPair{
-							check:  check,
-							result: result,
+							Check:  check,
+							Result: result,
 						},
 					)
 					if !result.Success {
@@ -109,23 +118,14 @@ func doCheck(conf *checkConfiguration) error {
 		}
 	}
 
-	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
-	columnFmt := color.New(color.FgYellow).SprintfFunc()
-
-	tbl := table.New("Name", "Is Success", "Message")
-	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
-
-	for _, pair := range results {
-		msg := pair.result.Message
-		msg = strings.ReplaceAll(msg, "\n", " - ")
-
-		tbl.AddRow(pair.check.Name, pair.result.Success, msg)
+	if conf.json {
+		err := outputResultAsJson(results)
+		if err != nil {
+			return err
+		}
+	} else {
+		outputResultTable(results)
 	}
-	fmt.Println()
-	fmt.Println()
-	tbl.Print()
-	fmt.Println()
-	fmt.Println()
 
 	if failureInd {
 		return errors.New("Errors detected")
@@ -134,11 +134,41 @@ func doCheck(conf *checkConfiguration) error {
 	}
 }
 
+func outputResultAsJson(results []*resultPair) error {
+	jsonData, err := json.Marshal(results)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf(string(jsonData))
+	return nil
+}
+
+func outputResultTable(results []*resultPair) {
+	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
+	columnFmt := color.New(color.FgYellow).SprintfFunc()
+
+	tbl := table.New("Name", "Is Success", "Message")
+	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
+
+	for _, pair := range results {
+		msg := pair.Result.Message
+		msg = strings.ReplaceAll(msg, "\n", " - ")
+
+		tbl.AddRow(pair.Check.Name, pair.Result.Success, msg)
+	}
+	fmt.Println()
+	fmt.Println()
+	tbl.Print()
+	fmt.Println()
+	fmt.Println()
+}
+
 func runCheck(check *common.CheckDef) (result *checkResult) {
 	context := context2.Background()
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Printf("Check failed - Panic Detected: %v\n", r)
+			log.Error(fmt.Sprintf("Check failed - Panic Detected: %v\n", r))
 			result = &checkResult{
 				Success: false,
 				Message: "Check failure due to panic",
@@ -147,11 +177,11 @@ func runCheck(check *common.CheckDef) (result *checkResult) {
 		if check.CleanupFunc != nil {
 			err := check.CleanupFunc(context)
 			if err != nil {
-				fmt.Printf("Error on cleanup - %v\n", err)
+				log.Error(fmt.Sprintf("Error on cleanup - %v\n", err))
 			}
 		}
 	}()
-	fmt.Printf("** Running check: %s...\n", check.Name)
+	log.Info(fmt.Sprintf("** Running check: %s...\n", check.Name))
 	message, err := check.CheckFunc(context)
 
 	if err == nil {
@@ -166,6 +196,6 @@ func runCheck(check *common.CheckDef) (result *checkResult) {
 		}
 	}
 
-	fmt.Printf("Finished running check: %s, result=%v, message=%v\n", check.Name, result.Success, result.Message)
+	log.Info(fmt.Sprintf("Finished running check: %s, result=%v, message=%v\n", check.Name, result.Success, result.Message))
 	return result
 }
