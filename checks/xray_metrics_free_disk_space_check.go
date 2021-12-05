@@ -67,12 +67,12 @@ func GetXrayMertricsFreeDiskSpaceCheck() *common.CheckDef {
 					return "", err
 				}
 				diskFreeValue := *mf["app_disk_free_bytes"].GetMetric()[0].Gauge.Value
-				shouldFail := diskFreeValue < math.Pow(2, 30) // 1G
+				shouldFail := diskFreeValue < 100*math.Pow(2, 30) // 100Gb
 				if shouldFail {
-					return "", errors.New(fmt.Sprintf("Xray disk free space is lower than 1G (%.f bytes)", diskFreeValue))
+					return "", errors.New(fmt.Sprintf("Xray disk free space is lower than 100Gb (%.f bytes)", diskFreeValue))
 				}
 
-				return fmt.Sprintf("Xray free disk space is above 1G (%.f bytes)", diskFreeValue), nil
+				return fmt.Sprintf("Xray free disk space is above 100Gb (%.f bytes)", diskFreeValue), nil
 			}
 		},
 		CleanupFunc: func(c context.Context) error {
