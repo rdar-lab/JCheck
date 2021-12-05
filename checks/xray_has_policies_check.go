@@ -13,9 +13,9 @@ import (
 	"net/http"
 )
 
-func GetXrayHasPolicies() *common.CheckDef {
+func GetXrayHasPoliciesCheck() *common.CheckDef {
 	return &common.CheckDef{
-		Name:        "XrayHasPolicies",
+		Name:        "XrayHasPoliciesCheck",
 		Group:       "Xray",
 		Description: "Performs a check that validates that XRAY has configured policies",
 		IsReadOnly:  true,

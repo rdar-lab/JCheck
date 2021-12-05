@@ -17,7 +17,7 @@ import (
 
 func GetXrayHasIndexedResourcesCheck() *common.CheckDef {
 	return &common.CheckDef{
-		Name:        "XrayHasIndexedResources",
+		Name:        "XrayHasIndexedResourcesCheck",
 		Group:       "Xray",
 		Description: "Performs a check that validates that XRAY has configured indexed resources",
 		IsReadOnly:  true,

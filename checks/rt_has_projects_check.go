@@ -5,41 +5,35 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/jfrog/jfrog-cli-core/v2/artifactory/utils"
 	"github.com/jfrog/jfrog-cli-core/v2/utils/config"
-	"github.com/jfrog/jfrog-cli-core/v2/xray/commands"
 	clientutils "github.com/jfrog/jfrog-client-go/utils"
 	"github.com/jfrog/jfrog-client-go/utils/errorutils"
 	"github.com/rdar-lab/JCheck/common"
 	"net/http"
 )
 
-func GetXrayHasWatchesCheck() *common.CheckDef {
+func GetRTHasProjectsCheck() *common.CheckDef {
 	return &common.CheckDef{
-		Name:        "XrayHasWatchesCheck",
+		Name:        "RTHasProjectsCheck",
 		Group:       "Xray",
 		Description: "Performs a check that validates that XRAY has configured watches",
 		IsReadOnly:  true,
 		CheckFunc: func(c context.Context) (string, error) {
-
 			serverConf, err := config.GetDefaultServerConf()
 			if err != nil {
 				return "", err
 			}
-
-			if serverConf.XrayUrl == "" {
-				return "", errors.New("xray service is not configured")
-			}
-
-			xrayServiceMgr, err := commands.CreateXrayServiceManager(serverConf)
+			serviceManager, err := utils.CreateServiceManager(serverConf, -1, false)
 			if err != nil {
 				return "", err
 			}
 
-			httpClientsDetails := xrayServiceMgr.Config().GetServiceDetails().CreateHttpClientDetails()
+			httpClientsDetails := serviceManager.GetConfig().GetServiceDetails().CreateHttpClientDetails()
 
-			url := clientutils.AddTrailingSlashIfNeeded(serverConf.XrayUrl) + "api/v2/watches"
+			url := clientutils.AddTrailingSlashIfNeeded(serverConf.ArtifactoryUrl) + "v1/projects"
 
-			resp, body, _, err := xrayServiceMgr.Client().SendGet(url, true, &httpClientsDetails)
+			resp, body, _, err := serviceManager.Client().SendGet(url, true, &httpClientsDetails)
 			if err != nil {
 				return "", err
 			}
@@ -47,21 +41,15 @@ func GetXrayHasWatchesCheck() *common.CheckDef {
 				return "", errorutils.CheckError(errorutils.GenerateResponseError(resp.Status, clientutils.IndentJson(body)))
 			}
 
-			watches := make([]struct{}, 0)
+			projects := make([]struct{}, 0)
 
-			err = json.Unmarshal(body, &watches)
+			err = json.Unmarshal(body, &projects)
 
 			if err != nil {
-				return "", errors.New("failed unmarshalling watches response")
+				return "", errors.New("failed unmarshalling projects response")
 			}
 
-			if len(watches) > 0 {
-
-				return fmt.Sprintf("detected %d watches", len(watches)), nil
-			} else {
-				return "", errors.New("detected 0 watches")
-			}
-
+			return fmt.Sprintf("detected %d projects", len(projects)), nil
 		},
 	}
 }
