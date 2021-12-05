@@ -128,14 +128,14 @@ func doCheck(conf *checkConfiguration) error {
 	}
 
 	if failureInd {
-		return errors.New("Errors detected")
+		return errors.New("errors detected")
 	} else {
 		return nil
 	}
 }
 
 func outputResultAsJson(results []*resultPair) error {
-	jsonData, err := json.Marshal(results)
+	jsonData, err := json.MarshalIndent(results, "", "\t")
 	if err != nil {
 		return err
 	}
