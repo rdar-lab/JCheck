@@ -24,9 +24,9 @@ func parseMF(reader io.Reader) (map[string]*dto.MetricFamily, error) {
 	return mf, nil
 }
 
-func GetXrayMertricsFreeDiskSpaceCheck() *common.CheckDef {
+func GetXrayFreeDiskSpaceCheck() *common.CheckDef {
 	return &common.CheckDef{
-		Name:        "GetXrayMertricsFreeDiskSpaceCheck",
+		Name:        "XrayFreeDiskSpaceCheck",
 		Group:       "Xray",
 		Description: "Performs a check that free disk space is above 1Gb",
 		IsReadOnly:  true,
