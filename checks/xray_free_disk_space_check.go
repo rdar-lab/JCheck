@@ -7,9 +7,12 @@ import (
 	"fmt"
 	"github.com/jfrog/jfrog-cli-core/v2/utils/config"
 	"github.com/jfrog/jfrog-cli-core/v2/xray/commands"
+	clientutils "github.com/jfrog/jfrog-client-go/utils"
+	"github.com/jfrog/jfrog-client-go/utils/errorutils"
 	"github.com/jfrog/jfrog-client-go/utils/io/httputils"
 	"github.com/rdar-lab/JCheck/common"
 	"math"
+	"net/http"
 )
 
 func GetXrayFreeDiskSpaceCheck() *common.CheckDef {
@@ -45,8 +48,8 @@ func GetXrayFreeDiskSpaceCheck() *common.CheckDef {
 				return "", err
 			}
 
-			if resp.StatusCode != 200 {
-				return "", errors.New("got http error for metrics")
+			if err = errorutils.CheckResponseStatus(resp, http.StatusOK); err != nil {
+				return "", errorutils.CheckError(errorutils.GenerateResponseError(resp.Status, clientutils.IndentJson(respBody)))
 			} else {
 				//strResp := string(respBody)
 				reader := bytes.NewReader(respBody)

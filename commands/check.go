@@ -10,10 +10,13 @@ import (
 	"github.com/jfrog/jfrog-client-go/utils/log"
 	"github.com/rdar-lab/JCheck/common"
 	"github.com/rodaine/table"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
 )
+
+var whitespaceRe = regexp.MustCompile(`\r\n|[\r\n\v\f\x{0085}\x{2028}\x{2029}]`)
 
 type checkResult struct {
 	Success bool   `json:"is_success"`
@@ -178,8 +181,7 @@ func outputResultTable(results []*resultPair) {
 
 	for _, pair := range results {
 		msg := pair.Result.Message
-		msg = strings.ReplaceAll(msg, "\n", " - ")
-
+		msg = whitespaceRe.ReplaceAllString(msg, " ")
 		tbl.AddRow(pair.Check.Name, pair.Result.Success, msg)
 	}
 	fmt.Println()
