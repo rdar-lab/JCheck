@@ -8,11 +8,11 @@ import (
 	"github.com/rdar-lab/JCheck/common"
 )
 
-func GetRTPingCheck() *common.CheckDef {
+func GetRTConnectionCheck() *common.CheckDef {
 	return &common.CheckDef{
-		Name:        "RTPingCheck",
+		Name:        "RTConnectionCheck",
 		Group:       "Artifactory",
-		Description: "Performs a check that validates that a ping to RT works",
+		Description: "Performs a check that validates that a connection to RT works",
 		IsReadOnly:  true,
 		CheckFunc: func(c context.Context) (string, error) {
 			rtDetails, err := config.GetDefaultServerConf()
@@ -23,15 +23,14 @@ func GetRTPingCheck() *common.CheckDef {
 			if err != nil {
 				return "", err
 			}
-			resp, err := serviceManager.Ping()
+			version, err := serviceManager.GetVersion()
 			if err != nil {
 				return "", err
 			}
-			respStr := string(resp)
-			if respStr != "OK" {
-				return "", errors.New("got unexpected response: " + respStr)
+			if version == "" {
+				return "", errors.New("empty version returned by RT")
 			} else {
-				return "RT Ping was successful", nil
+				return "RT version " + version + " was detected", nil
 			}
 		},
 	}
