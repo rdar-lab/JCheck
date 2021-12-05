@@ -12,6 +12,7 @@ import (
 	"github.com/rodaine/table"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type checkResult struct {
@@ -54,6 +55,11 @@ func getCheckFlags() []components.Flag {
 			Description:  "Loop over times.",
 			DefaultValue: "1",
 		},
+		components.StringFlag{
+			Name:         "loopSleep",
+			Description:  "Sleep time (in seconds) between loops.",
+			DefaultValue: "0",
+		},
 		components.BoolFlag{
 			Name:         "json",
 			Description:  "Return JSON result",
@@ -70,6 +76,7 @@ type checkConfiguration struct {
 	what         string
 	readOnlyMode bool
 	loop         int
+	loopSleep    int
 	json         bool
 }
 
@@ -86,6 +93,11 @@ func checkCmd(c *components.Context) error {
 		return err
 	}
 	conf.loop = loop
+	loopSleep, err := strconv.Atoi(c.GetStringFlagValue("loopSleep"))
+	if err != nil {
+		return err
+	}
+	conf.loopSleep = loopSleep
 	conf.json = c.GetBoolFlagValue("json")
 
 	return doCheck(conf)
@@ -115,6 +127,9 @@ func doCheck(conf *checkConfiguration) error {
 					}
 				}
 			}
+		}
+		if conf.loopSleep > 0 {
+			time.Sleep(time.Second * time.Duration(conf.loopSleep))
 		}
 	}
 
