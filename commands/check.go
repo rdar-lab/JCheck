@@ -111,6 +111,8 @@ type resultPair struct {
 func doCheck(conf *checkConfiguration) error {
 	failureInd := false
 	results := make([]*resultPair, 0, len(common.GetRegistry().GetAllChecks())*conf.loop)
+	checksCount := 0
+
 	for i := 0; i < conf.loop; i++ {
 		for _, check := range common.GetRegistry().GetAllChecks() {
 			if conf.what == "" || conf.what == "ALL" || conf.what == check.Name || conf.what == check.Group {
@@ -125,6 +127,7 @@ func doCheck(conf *checkConfiguration) error {
 					if !result.Success {
 						failureInd = true
 					}
+					checksCount++
 				}
 			}
 		}
@@ -140,6 +143,10 @@ func doCheck(conf *checkConfiguration) error {
 		}
 	} else {
 		outputResultTable(results)
+	}
+
+	if checksCount == 0 {
+		return errors.New("no checks performed")
 	}
 
 	if failureInd {
