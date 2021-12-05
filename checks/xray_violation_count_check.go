@@ -88,7 +88,7 @@ func GetXrayViolationsCountCheck() *common.CheckDef {
 				return "", errors.New("failed unmarshalling violations response")
 			}
 
-			if response.TotalViolations > LIMIT {
+			if response.TotalViolations <= LIMIT {
 
 				return fmt.Sprintf("detected %d violations in last 24 hours", response.TotalViolations), nil
 			} else {
