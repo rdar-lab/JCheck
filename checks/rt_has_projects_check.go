@@ -16,7 +16,7 @@ import (
 func GetRTHasProjectsCheck() *common.CheckDef {
 	return &common.CheckDef{
 		Name:        "RTHasProjectsCheck",
-		Group:       "Xray",
+		Group:       "Artifactory",
 		Description: "Performs a check that validates that RT has configured projects",
 		IsReadOnly:  true,
 		CheckFunc: func(c context.Context) (string, error) {
@@ -31,7 +31,7 @@ func GetRTHasProjectsCheck() *common.CheckDef {
 
 			httpClientsDetails := serviceManager.GetConfig().GetServiceDetails().CreateHttpClientDetails()
 
-			url := clientutils.AddTrailingSlashIfNeeded(serverConf.ArtifactoryUrl) + "v1/projects"
+			url := clientutils.AddTrailingSlashIfNeeded(serverConf.AccessUrl) + "api/v1/projects"
 
 			resp, body, _, err := serviceManager.Client().SendGet(url, true, &httpClientsDetails)
 			if err != nil {
