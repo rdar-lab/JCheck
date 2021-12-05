@@ -17,7 +17,7 @@ func GetRTHasProjectsCheck() *common.CheckDef {
 	return &common.CheckDef{
 		Name:        "RTHasProjectsCheck",
 		Group:       "Xray",
-		Description: "Performs a check that validates that XRAY has configured watches",
+		Description: "Performs a check that validates that RT has configured projects",
 		IsReadOnly:  true,
 		CheckFunc: func(c context.Context) (string, error) {
 			serverConf, err := config.GetDefaultServerConf()
