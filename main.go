@@ -33,6 +33,7 @@ func getCommands() []components.Command {
 func registerChecks() {
 	common.GetRegistry().Register(checks.GetSelfCheck())
 	common.GetRegistry().Register(checks.GetRTPingCheck())
+	common.GetRegistry().Register(checks.GetRTHasRepositoriesCheck())
 	common.GetRegistry().Register(checks.GetXrayPingCheck())
 	common.GetRegistry().Register(checks.GetXrayHasPolicies())
 	common.GetRegistry().Register(checks.GetXrayHasWatches())
