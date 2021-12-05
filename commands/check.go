@@ -115,7 +115,7 @@ func doCheck(conf *checkConfiguration) error {
 
 	for i := 0; i < conf.loop; i++ {
 		for _, check := range common.GetRegistry().GetAllChecks() {
-			if conf.what == "" || conf.what == "ALL" || conf.what == check.Name || conf.what == check.Group {
+			if conf.what == "" || strings.ToUpper(conf.what) == "ALL" || conf.what == check.Name || conf.what == check.Group {
 				if check.IsReadOnly || !conf.readOnlyMode {
 					result := runCheck(check)
 					results = append(results,
