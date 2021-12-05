@@ -2,12 +2,7 @@ package common
 
 import "context"
 
-type CheckResult struct {
-	Success bool
-	Message string
-}
-
-type CheckFuncDef func(c context.Context) *CheckResult
+type CheckFuncDef func(c context.Context) (string, error)
 type CleanupFuncDef func(c context.Context) error
 
 type CheckDef struct {

@@ -11,6 +11,11 @@ import (
 	"strconv"
 )
 
+type checkResult struct {
+	Success bool
+	Message string
+}
+
 func GetCheckCommand() components.Command {
 	return components.Command{
 		Name:        "check",
@@ -78,7 +83,7 @@ func checkCmd(c *components.Context) error {
 
 type resultPair struct {
 	check  *common.CheckDef
-	result *common.CheckResult
+	result *checkResult
 }
 
 func doCheck(conf *checkConfiguration) error {
@@ -125,12 +130,12 @@ func doCheck(conf *checkConfiguration) error {
 	}
 }
 
-func runCheck(check *common.CheckDef) (result *common.CheckResult) {
+func runCheck(check *common.CheckDef) (result *checkResult) {
 	context := context2.Background()
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Printf("Check failed - Panic Detected: %v\n", r)
-			result = &common.CheckResult{
+			result = &checkResult{
 				Success: false,
 				Message: "Check failure due to panic",
 			}
@@ -141,7 +146,20 @@ func runCheck(check *common.CheckDef) (result *common.CheckResult) {
 		}
 	}()
 	fmt.Printf("** Running check: %s...\n", check.Name)
-	result = check.CheckFunc(context)
+	message, err := check.CheckFunc(context)
+
+	if err == nil {
+		result = &checkResult{
+			Success: true,
+			Message: message,
+		}
+	} else {
+		result = &checkResult{
+			Success: false,
+			Message: err.Error(),
+		}
+	}
+
 	fmt.Printf("Finished running check: %s, result=%v, message=%v\n", check.Name, result.Success, result.Message)
 	return result
 }

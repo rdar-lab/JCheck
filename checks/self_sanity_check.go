@@ -2,6 +2,7 @@ package checks
 
 import (
 	"context"
+	"errors"
 	"github.com/jfrog/jfrog-client-go/utils"
 	"github.com/rdar-lab/JCheck/common"
 )
@@ -12,22 +13,16 @@ func GetSelfCheck() *common.CheckDef {
 		Group:       "Self",
 		Description: "A sanity check that should pass",
 		IsReadOnly:  true,
-		CheckFunc: func(c context.Context) *common.CheckResult {
+		CheckFunc: func(c context.Context) (string, error) {
 			shouldPanic, _ := utils.GetBoolEnvValue("PanicTest", false)
 			if shouldPanic {
 				panic("Panic indication detected")
 			}
 			shouldFail, _ := utils.GetBoolEnvValue("FailureTest", false)
 			if shouldFail {
-				return &common.CheckResult{
-					Success: false,
-					Message: "Failure indication detected",
-				}
+				return "", errors.New("failure indication detected")
 			}
-			return &common.CheckResult{
-				Success: true,
-				Message: "Self check passed",
-			}
+			return "Self check passed", nil
 		},
 		CleanupFunc: func(c context.Context) error {
 			return nil
