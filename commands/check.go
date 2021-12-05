@@ -191,6 +191,7 @@ func outputResultTable(results []*resultPair) {
 
 func runCheck(check *common.CheckDef) (result *checkResult) {
 	context := context2.Background()
+	context = context2.WithValue(context, "State", make(map[string]interface{}))
 	defer func() {
 		if r := recover(); r != nil {
 			log.Error(fmt.Sprintf("Check failed - Panic Detected: %v\n", r))
