@@ -28,7 +28,7 @@ func GetRTPingCheck() *common.CheckDef {
 				return "", err
 			}
 			respStr := string(resp)
-			if respStr != "pong" {
+			if respStr != "OK" {
 				return "", errors.New("got unexpected response: " + respStr)
 			} else {
 				return "RT Ping was successful", nil

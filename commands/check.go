@@ -9,6 +9,7 @@ import (
 	"github.com/rdar-lab/JCheck/common"
 	"github.com/rodaine/table"
 	"strconv"
+	"strings"
 )
 
 type checkResult struct {
@@ -115,7 +116,10 @@ func doCheck(conf *checkConfiguration) error {
 	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
 	for _, pair := range results {
-		tbl.AddRow(pair.check.Name, pair.result.Success, pair.result.Message)
+		msg := pair.result.Message
+		msg = strings.ReplaceAll(msg, "\n", " - ")
+
+		tbl.AddRow(pair.check.Name, pair.result.Success, msg)
 	}
 	fmt.Println()
 	fmt.Println()
