@@ -39,4 +39,5 @@ func registerChecks() {
 	common.GetRegistry().Register(checks.GetXrayHasPoliciesCheck())
 	common.GetRegistry().Register(checks.GetXrayHasWatchesCheck())
 	common.GetRegistry().Register(checks.GetXrayHasIndexedResourcesCheck())
+	common.GetRegistry().Register(checks.GetXrayViolationsCountCheck())
 }
