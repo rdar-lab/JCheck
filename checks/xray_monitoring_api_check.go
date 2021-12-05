@@ -74,7 +74,7 @@ func GetXrayMonitoringAPICheck() *common.CheckDef {
 				for _, problem := range monitoringStatus.Problems {
 					log.Warn(fmt.Sprintf("Problem detected: %s, services=%v, time=%v\n", problem.Problem, problem.Services, problem.ProblemTime))
 				}
-				return fmt.Sprintf("detected %d problems", len(monitoringStatus.Problems)), nil
+				return "", errors.New(fmt.Sprintf("detected %d problems", len(monitoringStatus.Problems)))
 			} else {
 				return "No problems found", nil
 			}
