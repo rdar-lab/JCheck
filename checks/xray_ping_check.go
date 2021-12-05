@@ -42,8 +42,5 @@ func GetXrayPingCheck() *common.CheckDef {
 				return "Xray version " + version + " was detected", nil
 			}
 		},
-		CleanupFunc: func(c context.Context) error {
-			return nil
-		},
 	}
 }

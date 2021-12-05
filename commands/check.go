@@ -144,9 +144,11 @@ func runCheck(check *common.CheckDef) (result *checkResult) {
 				Message: "Check failure due to panic",
 			}
 		}
-		err := check.CleanupFunc(context)
-		if err != nil {
-			fmt.Printf("Error on cleanup - %v\n", err)
+		if check.CleanupFunc != nil {
+			err := check.CleanupFunc(context)
+			if err != nil {
+				fmt.Printf("Error on cleanup - %v\n", err)
+			}
 		}
 	}()
 	fmt.Printf("** Running check: %s...\n", check.Name)

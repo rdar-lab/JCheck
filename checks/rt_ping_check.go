@@ -34,8 +34,5 @@ func GetRTPingCheck() *common.CheckDef {
 				return "RT Ping was successful", nil
 			}
 		},
-		CleanupFunc: func(c context.Context) error {
-			return nil
-		},
 	}
 }

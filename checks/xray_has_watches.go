@@ -63,8 +63,5 @@ func GetXrayHasWatches() *common.CheckDef {
 			}
 
 		},
-		CleanupFunc: func(c context.Context) error {
-			return nil
-		},
 	}
 }

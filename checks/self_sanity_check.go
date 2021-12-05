@@ -24,8 +24,5 @@ func GetSelfCheck() *common.CheckDef {
 			}
 			return "Self check passed", nil
 		},
-		CleanupFunc: func(c context.Context) error {
-			return nil
-		},
 	}
 }
