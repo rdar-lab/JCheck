@@ -57,7 +57,7 @@ func GetXrayFreeDiskSpaceCheck() *common.CheckDef {
 				diskFreeValue := *mf["app_disk_free_bytes"].GetMetric()[0].Gauge.Value
 				diskFreeValueInGB := diskFreeValue / math.Pow(2, 30)
 
-				shouldFail := diskFreeValue < 100
+				shouldFail := diskFreeValueInGB < 100
 				if shouldFail {
 					return "", errors.New(fmt.Sprintf("Xray disk free space is lower than 100Gb (%.2f Gb)", diskFreeValueInGB))
 				}
