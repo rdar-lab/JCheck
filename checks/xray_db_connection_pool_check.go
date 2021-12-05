@@ -9,14 +9,13 @@ import (
 	"github.com/jfrog/jfrog-cli-core/v2/xray/commands"
 	"github.com/jfrog/jfrog-client-go/utils/io/httputils"
 	"github.com/rdar-lab/JCheck/common"
-	"math"
 )
 
-func GetXrayFreeDiskSpaceCheck() *common.CheckDef {
+func GetXrayDbConnectionPoolCheck() *common.CheckDef {
 	return &common.CheckDef{
-		Name:        "XrayFreeDiskSpaceCheck",
+		Name:        "XrayDbConnectionPoolCheck",
 		Group:       "Xray",
-		Description: "Performs a check that free disk space is above 1Gb",
+		Description: "Performs a check that DB connection pool is not maxed",
 		IsReadOnly:  true,
 		CheckFunc: func(c context.Context) (string, error) {
 
@@ -54,19 +53,16 @@ func GetXrayFreeDiskSpaceCheck() *common.CheckDef {
 				if err != nil {
 					return "", err
 				}
-				diskFreeValue := *mf["app_disk_free_bytes"].GetMetric()[0].Gauge.Value
-				diskFreeValueInGB := diskFreeValue / math.Pow(2, 30)
+				dbUsed := *mf["db_connection_pool_in_use_total"].GetMetric()[0].Gauge.Value
+				dbMax := *mf["db_connection_pool_max_open_total"].GetMetric()[0].Gauge.Value
 
-				shouldFail := diskFreeValue < 100
+				shouldFail := dbUsed == dbMax
 				if shouldFail {
-					return "", errors.New(fmt.Sprintf("Xray disk free space is lower than 100Gb (%.2f Gb)", diskFreeValueInGB))
+					return "", errors.New(fmt.Sprintf("Xray DB connection pool is full (%.f/%.f connections)", dbUsed, dbMax))
 				}
 
-				return fmt.Sprintf("Xray free disk space is above 100Gb (%.2f Gb)", diskFreeValueInGB), nil
+				return fmt.Sprintf("Xray DB connection pool has available connections (%.f/%.f connections)", dbUsed, dbMax), nil
 			}
-		},
-		CleanupFunc: func(c context.Context) error {
-			return nil
 		},
 	}
 }
