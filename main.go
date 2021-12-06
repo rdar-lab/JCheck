@@ -34,7 +34,7 @@ func registerChecks() {
 	common.GetRegistry().Register(checks.GetSelfCheck())
 	common.GetRegistry().Register(checks.GetRTConnectionCheck())
 	common.GetRegistry().Register(checks.GetRTHasRepositoriesCheck())
-	common.GetRegistry().Register(checks.GetRTHasProjectsCheck())
+	//common.GetRegistry().Register(checks.GetRTHasProjectsCheck()) // Disabled due to permission issues
 	common.GetRegistry().Register(checks.GetXrayConnectionCheck())
 	common.GetRegistry().Register(checks.GetXrayHasPoliciesCheck())
 	common.GetRegistry().Register(checks.GetXrayHasWatchesCheck())

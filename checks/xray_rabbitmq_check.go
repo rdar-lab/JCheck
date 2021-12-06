@@ -7,9 +7,15 @@ import (
 	"fmt"
 	"github.com/jfrog/jfrog-cli-core/v2/utils/config"
 	"github.com/jfrog/jfrog-cli-core/v2/xray/commands"
+	clientutils "github.com/jfrog/jfrog-client-go/utils"
+	"github.com/jfrog/jfrog-client-go/utils/errorutils"
 	"github.com/jfrog/jfrog-client-go/utils/io/httputils"
+	"github.com/jfrog/jfrog-client-go/utils/log"
 	"github.com/rdar-lab/JCheck/common"
+	"net/http"
 )
+
+const THRESHOLD = 1000
 
 func GetXrayRabbitMQCheck() *common.CheckDef {
 	return &common.CheckDef{
@@ -44,8 +50,8 @@ func GetXrayRabbitMQCheck() *common.CheckDef {
 				return "", err
 			}
 
-			if resp.StatusCode != 200 {
-				return "", errors.New("got http error for metrics")
+			if err = errorutils.CheckResponseStatus(resp, http.StatusOK); err != nil {
+				return "", errorutils.CheckError(errorutils.GenerateResponseError(resp.Status, clientutils.IndentJson(respBody)))
 			} else {
 				//strResp := string(respBody)
 				reader := bytes.NewReader(respBody)
@@ -54,30 +60,21 @@ func GetXrayRabbitMQCheck() *common.CheckDef {
 					return "", err
 				}
 
-				monitorLabels := make(map[string]bool)
-				monitorLabels["alertImpactAnalysis"] = true
-				monitorLabels["ticketing"] = true
-				monitorLabels["report"] = true
-				monitorLabels["persistExistingContent"] = true
-
+				totalCount := 0.0
 				queueMetric := *mf["queue_messages_total"]
-				shouldFail := false
 				for _, qm := range queueMetric.Metric {
-					label := qm.Label[0].Value
-					value := qm.Gauge.Value
-					if monitorLabels[*label] {
-						if *value > 100 {
-							shouldFail = true
-							break
-						}
+					label := *qm.Label[0].Value
+					value := *qm.Gauge.Value
+
+					log.Info(fmt.Sprintf("Queue %s - size %.f", label, value))
+
+					if value > THRESHOLD {
+						return "", errors.New(fmt.Sprintf("Queue %s reached size of %.f", label, value))
 					}
+					totalCount += value
 				}
 
-				if shouldFail {
-					return "", errors.New(fmt.Sprintf("Rabbit MQ check has failed. Please check for overflowed queues"))
-				}
-
-				return fmt.Sprintf("Rabbit MQ check is valid"), nil
+				return fmt.Sprintf("Total number of messages = %.f", totalCount), nil
 			}
 		},
 	}

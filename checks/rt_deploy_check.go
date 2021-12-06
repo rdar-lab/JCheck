@@ -128,7 +128,7 @@ func GetRTDeployCheck() *common.CheckDef {
 			if sha256Downloaded != sha256Uploaded {
 				return "", errors.New("checksums mismatch")
 			}
-			return "", nil
+			return "Artifact deployed and downloaded successfully", nil
 		},
 		CleanupFunc: func(ctx context.Context) error {
 			stateMap, err := common.GetStateMapFromContext(ctx)
