@@ -43,4 +43,5 @@ func registerChecks() {
 	common.GetRegistry().Register(checks.GetXrayFreeDiskSpaceCheck())
 	common.GetRegistry().Register(checks.GetXrayMonitoringAPICheck())
 	common.GetRegistry().Register(checks.GetXrayDbConnectionPoolCheck())
+	common.GetRegistry().Register(checks.GetXrayRabbitMQCheck())
 }
