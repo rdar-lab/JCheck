@@ -45,7 +45,7 @@ func listCmd(c *components.Context) error {
 	columnFmt := color.New(color.FgYellow).SprintfFunc()
 
 	tbl := table.New("Name", "Description", "Group", "Is Read Only")
-	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
+	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt).WithPadding(5)
 
 	for _, check := range common.GetRegistry().GetAllChecks() {
 		tbl.AddRow(check.Name, check.Description, check.Group, check.IsReadOnly)

@@ -19,8 +19,9 @@ import (
 var whitespaceRe = regexp.MustCompile(`\r\n|[\r\n\v\f\x{0085}\x{2028}\x{2029}]`)
 
 type checkResult struct {
-	Success bool   `json:"is_success"`
-	Message string `json:"message"`
+	Time    time.Time `json:"time"`
+	Success bool      `json:"is_success"`
+	Message string    `json:"message"`
 }
 
 func GetCheckCommand() components.Command {
@@ -176,8 +177,8 @@ func outputResultTable(results []*resultPair) {
 	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
 	columnFmt := color.New(color.FgYellow).SprintfFunc()
 
-	tbl := table.New("Name", "Failure Ind", "Message")
-	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
+	tbl := table.New("Time", "Name", "Failure Ind", "Message")
+	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt).WithPadding(5)
 
 	for _, pair := range results {
 		msg := pair.Result.Message
@@ -188,7 +189,7 @@ func outputResultTable(results []*resultPair) {
 			failureStr = "FAIL"
 		}
 
-		tbl.AddRow(pair.Check.Name, failureStr, msg)
+		tbl.AddRow(pair.Result.Time.Format(time.StampMilli), pair.Check.Name, failureStr, msg)
 	}
 	fmt.Println()
 	fmt.Println()
@@ -220,11 +221,13 @@ func runCheck(check *common.CheckDef) (result *checkResult) {
 
 	if err == nil {
 		result = &checkResult{
+			Time:    time.Now(),
 			Success: true,
 			Message: message,
 		}
 	} else {
 		result = &checkResult{
+			Time:    time.Now(),
 			Success: false,
 			Message: err.Error(),
 		}
