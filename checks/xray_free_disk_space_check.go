@@ -19,7 +19,7 @@ func GetXrayFreeDiskSpaceCheck() *common.CheckDef {
 	return &common.CheckDef{
 		Name:        "XrayFreeDiskSpaceCheck",
 		Group:       "Xray",
-		Description: "Performs a check that free disk space is above 1Gb",
+		Description: "Performs a check that free disk space is above 100Gb",
 		IsReadOnly:  true,
 		CheckFunc: func(c context.Context) (string, error) {
 

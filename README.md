@@ -27,11 +27,20 @@ Uninstalling a plugin
     ```
   $ jfrog JCheck list
 
-  Name        Description   Group       Is Read Only
-  Check...    Desc...       Group....   true/false  
-  Check...    Desc...       Group....   true/false  
-  Check...    Desc...       Group....   true/false  
-
+    Name                          Description                                                                   Group        Is Read Only
+    RTConnectionCheck             Performs a check that validates that a connection to RT works                 Artifactory  true
+    RTDeployCheck                 Deploy a large file to Artifactory, download and verify checksum              Artifactory  false
+    RTHasRepositoriesCheck        Performs a check that validates that RT has configured repositories           Artifactory  true
+    SelfCheck                     A sanity check that should pass                                               Self         true
+    XrayConnectionCheck           Performs a check that validates that a connection to XRAY works               Xray         true
+    XrayDbConnectionPoolCheck     Performs a check that DB connection pool is not maxed                         Xray         true
+    XrayFreeDiskSpaceCheck        Performs a check that free disk space is above 100Gb                            Xray         true
+    XrayHasIndexedResourcesCheck  Performs a check that validates that XRAY has configured indexed resources    Xray         true
+    XrayHasPoliciesCheck          Performs a check that validates that XRAY has configured policies             Xray         true
+    XrayHasWatchesCheck           Performs a check that validates that XRAY has configured watches              Xray         true
+    XrayMonitoringAPICheck        Performs a check that calls XRAY monitoring API                               Xray         true
+    XrayRabbitMQCheck             Performs a check that critical queues are not overflowed                      Xray         true
+    XrayViolationCountCheck       Performs a check that checks that Xray is not generating too many violations  Xray         true
   ```
 
 * check
