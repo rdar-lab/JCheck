@@ -42,7 +42,12 @@ func GetRTDeployCheck() *common.CheckDef {
 			if err != nil {
 				return "", err
 			}
-			ctx = context.WithValue(ctx, "repos", []string{createRepoParams.Key})
+			state := ctx.Value("State")
+			stateMap, ok := state.(map[string]interface{})
+			if !ok {
+				return "", errors.New("error with testing platform")
+			}
+			stateMap["repo"] = createRepoParams.Key
 			f, err := ioutil.TempFile("", "randomfile")
 			if err != nil {
 				return "", err
@@ -90,7 +95,10 @@ func GetRTDeployCheck() *common.CheckDef {
 				return "", err
 			}
 			defer os.Remove(tempFile.Name())
-			tempFile.Close()
+			err = tempFile.Close()
+			if err != nil {
+				return "", err
+			}
 
 			downParams.Target = tempFile.Name()
 			downloadSummary, err := serviceManager.DownloadFilesWithSummary(downParams)
@@ -105,8 +113,8 @@ func GetRTDeployCheck() *common.CheckDef {
 			}
 			hasher = sha256.New()
 			_, file := path.Split(tempFile.Name())
-			path := workDir + os.TempDir() + "/" + file
-			downloadedFile, err := os.Open(path)
+			downloadedPath := workDir + os.TempDir() + "/" + file
+			downloadedFile, err := os.Open(downloadedPath)
 			defer downloadedFile.Close()
 			defer os.Remove(downloadedFile.Name())
 			if err != nil {
@@ -124,27 +132,29 @@ func GetRTDeployCheck() *common.CheckDef {
 			return "", nil
 		},
 		CleanupFunc: func(ctx context.Context) error {
-			repos := ctx.Value("repos")
-			if repos != nil {
-				resposStrings, ok := repos.([]string)
+			state := ctx.Value("State")
+			stateMap, ok := state.(map[string]interface{})
+			if !ok {
+				return errors.New("error with testing platform")
+			}
+			repo := stateMap["repo"]
+			if repo != nil {
+				respoStrings, ok := repo.(string)
 				if !ok {
-					return errors.New("failed to cleanup repositories")
+					return errors.New("failed to cleanup repository")
 				}
-				for _, repo := range resposStrings {
-					rtDetails, err := config.GetDefaultServerConf()
-					if err != nil {
-						return err
-					}
-					serviceManager, err := utils.CreateServiceManager(rtDetails, -1, false)
-					if err != nil {
-						return err
-					}
-					err = serviceManager.DeleteRepository(repo)
-					if err != nil {
-						return err
-					}
+				rtDetails, err := config.GetDefaultServerConf()
+				if err != nil {
+					return err
 				}
-
+				serviceManager, err := utils.CreateServiceManager(rtDetails, -1, false)
+				if err != nil {
+					return err
+				}
+				err = serviceManager.DeleteRepository(respoStrings)
+				if err != nil {
+					return err
+				}
 			}
 			return nil
 		},
