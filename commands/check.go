@@ -10,10 +10,13 @@ import (
 	"github.com/jfrog/jfrog-client-go/utils/log"
 	"github.com/rdar-lab/JCheck/common"
 	"github.com/rodaine/table"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
 )
+
+var whitespaceRe = regexp.MustCompile(`\r\n|[\r\n\v\f\x{0085}\x{2028}\x{2029}]`)
 
 type checkResult struct {
 	Success bool   `json:"is_success"`
@@ -111,9 +114,14 @@ type resultPair struct {
 func doCheck(conf *checkConfiguration) error {
 	failureInd := false
 	results := make([]*resultPair, 0, len(common.GetRegistry().GetAllChecks())*conf.loop)
+	checksCount := 0
+
 	for i := 0; i < conf.loop; i++ {
 		for _, check := range common.GetRegistry().GetAllChecks() {
-			if conf.what == "" || conf.what == "ALL" || conf.what == check.Name || conf.what == check.Group {
+			if conf.what == "" ||
+				strings.ToUpper(conf.what) == "ALL" ||
+				strings.Contains(strings.ToLower(check.Name), strings.ToLower(conf.what)) ||
+				strings.Contains(strings.ToLower(check.Group), strings.ToLower(conf.what)) {
 				if check.IsReadOnly || !conf.readOnlyMode {
 					result := runCheck(check)
 					results = append(results,
@@ -125,6 +133,7 @@ func doCheck(conf *checkConfiguration) error {
 					if !result.Success {
 						failureInd = true
 					}
+					checksCount++
 				}
 			}
 		}
@@ -140,6 +149,10 @@ func doCheck(conf *checkConfiguration) error {
 		}
 	} else {
 		outputResultTable(results)
+	}
+
+	if checksCount == 0 {
+		return errors.New("no checks performed")
 	}
 
 	if failureInd {
@@ -168,8 +181,7 @@ func outputResultTable(results []*resultPair) {
 
 	for _, pair := range results {
 		msg := pair.Result.Message
-		msg = strings.ReplaceAll(msg, "\n", " - ")
-
+		msg = whitespaceRe.ReplaceAllString(msg, " ")
 		tbl.AddRow(pair.Check.Name, pair.Result.Success, msg)
 	}
 	fmt.Println()
@@ -181,6 +193,7 @@ func outputResultTable(results []*resultPair) {
 
 func runCheck(check *common.CheckDef) (result *checkResult) {
 	context := context2.Background()
+	context = context2.WithValue(context, "State", make(map[string]interface{}))
 	defer func() {
 		if r := recover(); r != nil {
 			log.Error(fmt.Sprintf("Check failed - Panic Detected: %v\n", r))

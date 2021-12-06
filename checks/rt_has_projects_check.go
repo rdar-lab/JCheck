@@ -31,7 +31,7 @@ func GetRTHasProjectsCheck() *common.CheckDef {
 
 			httpClientsDetails := serviceManager.GetConfig().GetServiceDetails().CreateHttpClientDetails()
 
-			url := clientutils.AddTrailingSlashIfNeeded(serverConf.AccessUrl) + "api/v1/projects"
+			url := clientutils.AddTrailingSlashIfNeeded(serverConf.Url) + "access/api/v1/projects"
 
 			resp, body, _, err := serviceManager.Client().SendGet(url, true, &httpClientsDetails)
 			if err != nil {
