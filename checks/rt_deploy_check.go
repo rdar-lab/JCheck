@@ -42,10 +42,9 @@ func GetRTDeployCheck() *common.CheckDef {
 			if err != nil {
 				return "", err
 			}
-			state := ctx.Value("State")
-			stateMap, ok := state.(map[string]interface{})
-			if !ok {
-				return "", errors.New("error with testing platform")
+			stateMap, err := common.GetStateMapFromContext(ctx)
+			if err != nil {
+				return "", err
 			}
 			stateMap["repo"] = createRepoParams.Key
 			f, err := ioutil.TempFile("", "randomfile")
@@ -56,7 +55,7 @@ func GetRTDeployCheck() *common.CheckDef {
 			defer os.Remove(f.Name())
 			hasher := sha256.New()
 			buf := make([]byte, 1024*1024)
-			for i := 0; i < 1; i++ {
+			for i := 0; i < 100; i++ {
 				_, err := randomGenerator.Read(buf)
 				if err != nil {
 					return "", err
@@ -132,14 +131,13 @@ func GetRTDeployCheck() *common.CheckDef {
 			return "", nil
 		},
 		CleanupFunc: func(ctx context.Context) error {
-			state := ctx.Value("State")
-			stateMap, ok := state.(map[string]interface{})
-			if !ok {
-				return errors.New("error with testing platform")
+			stateMap, err := common.GetStateMapFromContext(ctx)
+			if err != nil {
+				return err
 			}
 			repo := stateMap["repo"]
 			if repo != nil {
-				respoStrings, ok := repo.(string)
+				repoStrings, ok := repo.(string)
 				if !ok {
 					return errors.New("failed to cleanup repository")
 				}
@@ -151,7 +149,7 @@ func GetRTDeployCheck() *common.CheckDef {
 				if err != nil {
 					return err
 				}
-				err = serviceManager.DeleteRepository(respoStrings)
+				err = serviceManager.DeleteRepository(repoStrings)
 				if err != nil {
 					return err
 				}

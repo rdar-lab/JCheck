@@ -1,7 +1,7 @@
 package commands
 
 import (
-	context2 "context"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -198,8 +198,8 @@ func outputResultTable(results []*resultPair) {
 }
 
 func runCheck(check *common.CheckDef) (result *checkResult) {
-	context := context2.Background()
-	context = context2.WithValue(context, "State", make(map[string]interface{}))
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "State", make(map[string]interface{}))
 	defer func() {
 		if r := recover(); r != nil {
 			log.Error(fmt.Sprintf("Check failed - Panic Detected: %v\n", r))
@@ -209,14 +209,14 @@ func runCheck(check *common.CheckDef) (result *checkResult) {
 			}
 		}
 		if check.CleanupFunc != nil {
-			err := check.CleanupFunc(context)
+			err := check.CleanupFunc(ctx)
 			if err != nil {
 				log.Error(fmt.Sprintf("Error on cleanup - %v\n", err))
 			}
 		}
 	}()
 	log.Info(fmt.Sprintf("** Running check: %s...\n", check.Name))
-	message, err := check.CheckFunc(context)
+	message, err := check.CheckFunc(ctx)
 
 	if err == nil {
 		result = &checkResult{
