@@ -8,11 +8,11 @@ import (
 	"github.com/rdar-lab/JCheck/common"
 )
 
-func GetXrayPingCheck() *common.CheckDef {
+func GetXrayConnectionCheck() *common.CheckDef {
 	return &common.CheckDef{
-		Name:        "XrayPingCheck",
+		Name:        "XrayConnectionCheck",
 		Group:       "Xray",
-		Description: "Performs a check that validates that a ping to XRAY works",
+		Description: "Performs a check that validates that a connection to XRAY works",
 		IsReadOnly:  true,
 		CheckFunc: func(c context.Context) (string, error) {
 
@@ -41,9 +41,6 @@ func GetXrayPingCheck() *common.CheckDef {
 			} else {
 				return "Xray version " + version + " was detected", nil
 			}
-		},
-		CleanupFunc: func(c context.Context) error {
-			return nil
 		},
 	}
 }

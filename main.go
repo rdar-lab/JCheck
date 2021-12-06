@@ -31,9 +31,17 @@ func getCommands() []components.Command {
 
 // TODO: Add ability to inject external checks via configuration
 func registerChecks() {
-	reg := common.GetRegistry()
-	reg.Register(checks.GetSelfCheck())
-	reg.Register(checks.GetRTPingCheck())
-	reg.Register(checks.GetXrayPingCheck())
-	reg.Register(checks.GetRTDeployCheck())
+	common.GetRegistry().Register(checks.GetSelfCheck())
+	common.GetRegistry().Register(checks.GetRTConnectionCheck())
+	common.GetRegistry().Register(checks.GetRTHasRepositoriesCheck())
+	common.GetRegistry().Register(checks.GetRTHasProjectsCheck())
+	common.GetRegistry().Register(checks.GetXrayConnectionCheck())
+	common.GetRegistry().Register(checks.GetXrayHasPoliciesCheck())
+	common.GetRegistry().Register(checks.GetXrayHasWatchesCheck())
+	common.GetRegistry().Register(checks.GetXrayHasIndexedResourcesCheck())
+	common.GetRegistry().Register(checks.GetXrayViolationsCountCheck())
+	common.GetRegistry().Register(checks.GetXrayFreeDiskSpaceCheck())
+	common.GetRegistry().Register(checks.GetXrayMonitoringAPICheck())
+	common.GetRegistry().Register(checks.GetXrayDbConnectionPoolCheck())
+	common.GetRegistry().Register(checks.GetRTDeployCheck())
 }

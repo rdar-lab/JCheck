@@ -3,16 +3,17 @@ package checks
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/jfrog/jfrog-cli-core/v2/artifactory/utils"
 	"github.com/jfrog/jfrog-cli-core/v2/utils/config"
 	"github.com/rdar-lab/JCheck/common"
 )
 
-func GetRTPingCheck() *common.CheckDef {
+func GetRTHasRepositoriesCheck() *common.CheckDef {
 	return &common.CheckDef{
-		Name:        "RTPingCheck",
+		Name:        "RTHasRepositoriesCheck",
 		Group:       "Artifactory",
-		Description: "Performs a check that validates that a ping to RT works",
+		Description: "Performs a check that validates that RT has configured repositories",
 		IsReadOnly:  true,
 		CheckFunc: func(c context.Context) (string, error) {
 			rtDetails, err := config.GetDefaultServerConf()
@@ -23,19 +24,15 @@ func GetRTPingCheck() *common.CheckDef {
 			if err != nil {
 				return "", err
 			}
-			resp, err := serviceManager.Ping()
+			repos, err := serviceManager.GetAllRepositories()
 			if err != nil {
 				return "", err
 			}
-			respStr := string(resp)
-			if respStr != "pong" {
-				return "", errors.New("got unexpected response: " + respStr)
+			if len(*repos) == 0 {
+				return "", errors.New("detected 0 repositories")
 			} else {
-				return "RT Ping was successful", nil
+				return fmt.Sprintf("detected %d repositories", len(*repos)), nil
 			}
-		},
-		CleanupFunc: func(c context.Context) error {
-			return nil
 		},
 	}
 }

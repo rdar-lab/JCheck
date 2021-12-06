@@ -2,6 +2,7 @@ package commands
 
 import (
 	"errors"
+	"fmt"
 	"github.com/fatih/color"
 	"github.com/jfrog/jfrog-cli-core/v2/plugins/components"
 	"github.com/rdar-lab/JCheck/common"
@@ -49,6 +50,10 @@ func listCmd(c *components.Context) error {
 	for _, check := range common.GetRegistry().GetAllChecks() {
 		tbl.AddRow(check.Name, check.Description, check.Group, check.IsReadOnly)
 	}
+	fmt.Println()
+	fmt.Println()
 	tbl.Print()
+	fmt.Println()
+	fmt.Println()
 	return nil
 }
