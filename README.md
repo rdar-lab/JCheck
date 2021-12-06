@@ -34,7 +34,7 @@ Uninstalling a plugin
     SelfCheck                     A sanity check that should pass                                               Self         true
     XrayConnectionCheck           Performs a check that validates that a connection to XRAY works               Xray         true
     XrayDbConnectionPoolCheck     Performs a check that DB connection pool is not maxed                         Xray         true
-    XrayFreeDiskSpaceCheck        Performs a check that free disk space is above 100Gb                            Xray         true
+    XrayFreeDiskSpaceCheck        Performs a check that free disk space is above 100Gb                          Xray         true
     XrayHasIndexedResourcesCheck  Performs a check that validates that XRAY has configured indexed resources    Xray         true
     XrayHasPoliciesCheck          Performs a check that validates that XRAY has configured policies             Xray         true
     XrayHasWatchesCheck           Performs a check that validates that XRAY has configured watches              Xray         true
