@@ -51,7 +51,7 @@ func (suite *CheckCommandSuite) TestSanityCheckPanic() {
 
 	err = doCheck(conf)
 	assert.NotNil(suite.T(), err)
-	assert.Equal(suite.T(), err.Error(), "errors detected")
+	assert.Equal(suite.T(), err.Error(), "failures detected")
 }
 
 func (suite *CheckCommandSuite) TestSanityCheckFailure() {
@@ -72,7 +72,7 @@ func (suite *CheckCommandSuite) TestSanityCheckFailure() {
 
 	err = doCheck(conf)
 	assert.NotNil(suite.T(), err)
-	assert.Equal(suite.T(), err.Error(), "errors detected")
+	assert.Equal(suite.T(), err.Error(), "failures detected")
 }
 
 func TestCheckCommandSuite(t *testing.T) {
