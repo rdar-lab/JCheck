@@ -156,7 +156,7 @@ func doCheck(conf *checkConfiguration) error {
 	}
 
 	if failureInd {
-		return errors.New("errors detected")
+		return errors.New("failures detected")
 	} else {
 		return nil
 	}
@@ -176,13 +176,19 @@ func outputResultTable(results []*resultPair) {
 	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
 	columnFmt := color.New(color.FgYellow).SprintfFunc()
 
-	tbl := table.New("Name", "Is Success", "Message")
+	tbl := table.New("Name", "Failure Ind", "Message")
 	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
 	for _, pair := range results {
 		msg := pair.Result.Message
 		msg = whitespaceRe.ReplaceAllString(msg, " ")
-		tbl.AddRow(pair.Check.Name, pair.Result.Success, msg)
+
+		failureStr := ""
+		if !pair.Result.Success {
+			failureStr = "FAIL"
+		}
+
+		tbl.AddRow(pair.Check.Name, failureStr, msg)
 	}
 	fmt.Println()
 	fmt.Println()
