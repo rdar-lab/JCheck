@@ -31,7 +31,9 @@ func getCommands() []components.Command {
 
 // TODO: Add ability to inject external checks via configuration
 func registerChecks() {
-	common.GetRegistry().Register(checks.GetSelfCheck())
-	common.GetRegistry().Register(checks.GetRTPingCheck())
-	common.GetRegistry().Register(checks.GetXrayPingCheck())
+	reg := common.GetRegistry()
+	reg.Register(checks.GetSelfCheck())
+	reg.Register(checks.GetRTPingCheck())
+	reg.Register(checks.GetXrayPingCheck())
+	reg.Register(checks.GetRTDeployCheck())
 }
