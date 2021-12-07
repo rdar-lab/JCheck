@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/fatih/color"
+	"github.com/guptarohit/asciigraph"
 	"github.com/jfrog/jfrog-cli-core/v2/plugins/components"
 	"github.com/jfrog/jfrog-client-go/utils/log"
 	"github.com/rdar-lab/JCheck/common"
@@ -149,7 +150,7 @@ func doCheck(conf *checkConfiguration) error {
 			return err
 		}
 	} else {
-		outputResultTable(results)
+		outputResultToConsole(results)
 	}
 
 	if checksCount == 0 {
@@ -173,12 +174,14 @@ func outputResultAsJson(results []*resultPair) error {
 	return nil
 }
 
-func outputResultTable(results []*resultPair) {
+func outputResultToConsole(results []*resultPair) {
 	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
 	columnFmt := color.New(color.FgYellow).SprintfFunc()
 
 	tbl := table.New("Time", "Name", "Failure Ind", "Message")
 	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt).WithPadding(5)
+
+	failuresGraphData := make([]float64, 0, len(results))
 
 	for _, pair := range results {
 		msg := pair.Result.Message
@@ -187,6 +190,9 @@ func outputResultTable(results []*resultPair) {
 		failureStr := ""
 		if !pair.Result.Success {
 			failureStr = "FAIL"
+			failuresGraphData = append(failuresGraphData, 1)
+		} else {
+			failuresGraphData = append(failuresGraphData, 0)
 		}
 
 		tbl.AddRow(pair.Result.Time.Format(time.StampMilli), pair.Check.Name, failureStr, msg)
@@ -194,6 +200,13 @@ func outputResultTable(results []*resultPair) {
 	fmt.Println()
 	fmt.Println()
 	tbl.Print()
+	fmt.Println()
+	fmt.Println()
+	graph := asciigraph.Plot(failuresGraphData,
+		asciigraph.Caption("--- Failures ---"),
+		asciigraph.Precision(0),
+	)
+	fmt.Println(graph)
 	fmt.Println()
 	fmt.Println()
 }
