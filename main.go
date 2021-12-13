@@ -15,9 +15,9 @@ func main() {
 
 func getApp() components.App {
 	app := components.App{}
-	app.Name = "JCheck"
+	app.Name = "jcheck"
 	app.Description = " A Micro-UTP, plug-able sanity checker for any on-prem JFrog platform instance."
-	app.Version = "v0.1.0"
+	app.Version = "v1.0.0"
 	app.Commands = getCommands()
 	return app
 }
