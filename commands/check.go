@@ -144,17 +144,17 @@ func doCheck(conf *checkConfiguration) error {
 		}
 	}
 
-	if conf.json {
-		err := outputResultAsJson(results)
-		if err != nil {
-			return err
-		}
-	} else {
-		outputResultToConsole(results)
-	}
-
 	if checksCount == 0 {
-		return errors.New("no checks performed")
+		return errors.New("no checks performed. Check 'what' argument")
+	} else {
+		if conf.json {
+			err := outputResultAsJson(results)
+			if err != nil {
+				return err
+			}
+		} else {
+			outputResultToConsole(results)
+		}
 	}
 
 	if failureInd {
