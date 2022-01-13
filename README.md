@@ -6,15 +6,15 @@ A Micro-UTP, plug-able sanity checker for any on-prem JFrog platform instance
 ## Installation with JFrog CLI
 Installing the latest version:
 
-`$ jfrog plugin install JCheck`
+`$ jf plugin install jcheck`
 
 Installing a specific version:
 
-`$ jfrog plugin install JCheck@version`
+`$ jf plugin install jcheck@version`
 
 Uninstalling a plugin
 
-`$ jfrog plugin uninstall JCheck`
+`$ jf plugin uninstall jcheck`
 
 ## Usage
 ### Commands
@@ -25,7 +25,7 @@ Uninstalling a plugin
         - None
     - Example:
     ```
-  $ jfrog JCheck list
+  $ jf jcheck list
 
     Name                          Description                                                                   Group        Is Read Only
     RTConnectionCheck             Performs a check that validates that a connection to RT works                 Artifactory  true
@@ -53,7 +53,7 @@ Uninstalling a plugin
         - json: Return JSON result. **[Default: false]**
     - Example:
     ```
-  $ jfrog JCheck ALL
+  $ jf jcheck ALL
   
     ** Running check: ...
     ......
